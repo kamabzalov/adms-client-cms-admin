@@ -2,7 +2,6 @@
   "name": "adms-client-cms-admin",
   "version": "8.1.9",
   "private": true,
-  "homepage": "./",
   "dependencies": {
     "@formatjs/intl-pluralrules": "5.2.4",
     "@formatjs/intl-relativetimeformat": "11.2.4",
