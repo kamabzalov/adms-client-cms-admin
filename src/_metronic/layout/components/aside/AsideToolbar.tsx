@@ -27,7 +27,7 @@ const AsideToolbar = () => {
                 href="#"
                 className="text-white text-hover-primary fs-6 fw-bold"
               >
-                {currentUser?.first_name} {currentUser?.last_name}
+                {currentUser?.firstname} {currentUser?.lastname}
               </a>
               {/*end::Username*/}
 

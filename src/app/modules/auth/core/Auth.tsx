@@ -1,22 +1,22 @@
 import {
-  FC,
-  useState,
-  useEffect,
   createContext,
-  useContext,
-  useRef,
   Dispatch,
+  FC,
   SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
 } from "react";
 import { LayoutSplashScreen } from "../../../../_metronic/layout/core";
-import { AuthModel, UserModel } from "./_models";
 import * as authHelper from "./AuthHelpers";
-import { getUserByToken } from "./_requests";
+import { getAuth } from "./AuthHelpers";
 import { WithChildren } from "../../../../_metronic/helpers";
+import { UserModel } from "../../../models/auth";
 
 type AuthContextProps = {
-  auth: AuthModel | undefined;
-  saveAuth: (auth: AuthModel | undefined) => void;
+  auth: UserModel | undefined;
+  saveAuth: (auth: UserModel | undefined) => void;
   currentUser: UserModel | undefined;
   setCurrentUser: Dispatch<SetStateAction<UserModel | undefined>>;
   logout: () => void;
@@ -37,9 +37,9 @@ const useAuth = () => {
 };
 
 const AuthProvider: FC<WithChildren> = ({ children }) => {
-  const [auth, setAuth] = useState<AuthModel | undefined>(authHelper.getAuth());
+  const [auth, setAuth] = useState<UserModel | undefined>(authHelper.getAuth());
   const [currentUser, setCurrentUser] = useState<UserModel | undefined>();
-  const saveAuth = (auth: AuthModel | undefined) => {
+  const saveAuth = (auth: UserModel | undefined) => {
     setAuth(auth);
     if (auth) {
       authHelper.setAuth(auth);
@@ -66,12 +66,11 @@ const AuthInit: FC<WithChildren> = ({ children }) => {
   const { auth, logout, setCurrentUser } = useAuth();
   const didRequest = useRef(false);
   const [showSplashScreen, setShowSplashScreen] = useState(true);
-  // We should request user by authToken (IN OUR EXAMPLE IT'S API_TOKEN) before rendering the application
   useEffect(() => {
     const requestUser = async (apiToken: string) => {
       try {
         if (!didRequest.current) {
-          const { data } = await getUserByToken(apiToken);
+          const data = getAuth();
           if (data) {
             setCurrentUser(data);
           }
@@ -88,10 +87,9 @@ const AuthInit: FC<WithChildren> = ({ children }) => {
       return () => (didRequest.current = true);
     };
 
-    if (auth && auth.api_token) {
-      requestUser(auth.api_token);
+    if (auth && auth.token) {
+      requestUser(auth.token);
     } else {
-      logout();
       setShowSplashScreen(false);
     }
     // eslint-disable-next-line
