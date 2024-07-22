@@ -1,147 +1,71 @@
-import { useIntl } from "react-intl";
 import { PageTitle } from "../../../_metronic/layout/core";
-import {
-  ListsWidget1,
-  ListsWidget2,
-  ListsWidget3,
-  ListsWidget4,
-  ListsWidget5,
-  ListsWidget6,
-  MixedWidget10,
-  MixedWidget11,
-  MixedWidget2,
-  StatisticsWidget5,
-  TablesWidget10,
-  TablesWidget5,
-} from "../../../_metronic/partials/widgets";
+import { useAuth } from "../../modules/auth";
+import { useQuery } from "react-query";
+import { generateSiteKey, getSiteKey } from "../../http/_requests";
+import { useFormik } from "formik";
+import { useState } from "react";
+import { SiteKey } from "../../models/dashboard";
 
-const DashboardPage = () => (
-  <>
-    {/* begin::Row */}
-    <div className="row g-5 g-xl-8">
-      <div className="col-xl-4">
-        <StatisticsWidget5
-          className="card-xl-stretch mb-xl-8"
-          svgIcon="basket"
-          color="body-white"
-          iconColor="primary"
-          title="Shopping Cart"
-          description="Lands, Houses, Ranchos, Farms"
-          titleColor="gray-900"
-          descriptionColor="gray-400"
-        />
-      </div>
+const DashboardPage = () => {
+  const { currentUser } = useAuth();
+  const [siteKey, setSiteKey] = useState<SiteKey | undefined>(undefined);
+  useQuery({
+    queryKey: ["siteKey"],
+    queryFn: () =>
+      getSiteKey(currentUser?.useruid).then((response) => {
+        console.log(response);
+        // setSiteKey(response)
+      }),
+    staleTime: Infinity,
+  });
 
-      <div className="col-xl-4">
-        <StatisticsWidget5
-          className="card-xl-stretch mb-xl-8"
-          svgIcon="element-11"
-          color="primary"
-          iconColor="white"
-          title="Appartments"
-          description="Flats, Shared Rooms, Duplex"
-          titleColor="white"
-          descriptionColor="white"
-        />
-      </div>
-
-      <div className="col-xl-4">
-        <StatisticsWidget5
-          className="card-xl-stretch mb-5 mb-xl-8"
-          svgIcon="left"
-          color="dark"
-          iconColor="gray-100"
-          title="Sales Stats"
-          description="50% Increased for FY20"
-          titleColor="gray-100"
-          descriptionColor="gray-100"
-        />
-      </div>
-    </div>
-    {/* end::Row */}
-
-    {/* begin::Row */}
-    <div className="row g-5 g-xl-8">
-      {/* begin::Col */}
-      <div className="col-xl-4">
-        <ListsWidget1 className="card-xl-stretch mb-xl-8" />
-      </div>
-      {/* end::Col */}
-
-      {/* begin::Col */}
-      <div className="col-xl-8">
-        <TablesWidget5 className="card-xl-stretch mb-5 mb-xl-8" />
-      </div>
-      {/* end::Col */}
-    </div>
-    {/* end::Row */}
-
-    {/* begin::Row */}
-    <div className="row gy-5 g-xl-8">
-      <div className="col-xxl-4">
-        <MixedWidget2
-          className="card-xl-stretch mb-xl-8"
-          chartColor="danger"
-          chartHeight="200px"
-          strokeColor="#cb1e46"
-        />
-      </div>
-      <div className="col-xxl-4">
-        <ListsWidget5 className="card-xxl-stretch" />
-      </div>
-      <div className="col-xxl-4">
-        <MixedWidget10
-          className="card-xxl-stretch-50 mb-5 mb-xl-8"
-          chartColor="primary"
-          chartHeight="150px"
-        />
-        <MixedWidget11
-          className="card-xxl-stretch-50 mb-5 mb-xl-8"
-          chartColor="primary"
-          chartHeight="175px"
-        />
-      </div>
-    </div>
-    {/* end::Row */}
-
-    {/* begin::Row */}
-    <div className="row gy-5 gx-xl-8">
-      <div className="col-xxl-4">
-        <ListsWidget3 className="card-xxl-stretch mb-xl-3" />
-      </div>
-      <div className="col-xl-8">
-        <TablesWidget10 className="card-xxl-stretch mb-5 mb-xl-8" />
-      </div>
-    </div>
-    {/* end::Row */}
-
-    {/* begin::Row */}
-    <div className="row gy-5 g-xl-8">
-      <div className="col-xl-4">
-        <ListsWidget2 className="card-xl-stretch mb-xl-8" />
-      </div>
-      <div className="col-xl-4">
-        <ListsWidget6 className="card-xl-stretch mb-xl-8" />
-      </div>
-      <div className="col-xl-4">
-        <ListsWidget4 className="card-xl-stretch mb-5 mb-xl-8" items={5} />
-        {/* partials/widgets/lists/_widget-4', 'class' => 'card-xl-stretch mb-5 mb-xl-8', 'items' => '5' */}
-      </div>
-    </div>
-    {/* end::Row */}
-  </>
-);
-
-const DashboardWrapper = () => {
-  const intl = useIntl();
+  const formik = useFormik({
+    initialValues: {
+      siteKey: siteKey?.apikey ?? "",
+    },
+    enableReinitialize: true,
+    onSubmit: async () => {
+      const newKey = await generateSiteKey(currentUser?.useruid);
+      setSiteKey(newKey);
+    },
+  });
   return (
     <>
-      <PageTitle breadcrumbs={[]}>
-        {intl.formatMessage({ id: "MENU.DASHBOARD" })}
-      </PageTitle>
-      <DashboardPage />
+      <div className="row gy-5 g-xl-8">
+        <div className="card">
+          <div className="card-header border-0 pt-6 pb-6">
+            <form className="form w-50" onSubmit={formik.handleSubmit}>
+              <div className="fv-row mb-7">
+                <label className="fw-bold fs-6 mb-2">Site key</label>
+                <input
+                  placeholder="Site key"
+                  type="text"
+                  name="siteKey"
+                  className="form-control form-control-solid mb-3 mb-lg-0"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  value={formik.initialValues.siteKey}
+                  disabled={true}
+                />
+              </div>
+              <div>
+                <button type="submit" className="btn btn-primary me-3">
+                  Generate new
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
 
-export { DashboardWrapper };
+export const DashboardWrapper = () => {
+  return (
+    <>
+      <PageTitle breadcrumbs={[]}></PageTitle>
+      <DashboardPage />
+    </>
+  );
+};

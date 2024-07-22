@@ -1,7 +1,8 @@
-import { AuthModel } from "./_models";
+import { UserModel } from "../../../models/auth";
 
-const AUTH_LOCAL_STORAGE_KEY = "kt-auth-react-v";
-const getAuth = (): AuthModel | undefined => {
+const AUTH_LOCAL_STORAGE_KEY = "client-site-cms";
+
+const getAuth = (): UserModel | undefined => {
   if (!localStorage) {
     return;
   }
@@ -12,9 +13,8 @@ const getAuth = (): AuthModel | undefined => {
   }
 
   try {
-    const auth: AuthModel = JSON.parse(lsValue) as AuthModel;
+    const auth: UserModel = JSON.parse(lsValue) as UserModel;
     if (auth) {
-      // You can easily check auth_token expiration also
       return auth;
     }
   } catch (error) {
@@ -22,7 +22,7 @@ const getAuth = (): AuthModel | undefined => {
   }
 };
 
-const setAuth = (auth: AuthModel) => {
+const setAuth = (auth: UserModel) => {
   if (!localStorage) {
     return;
   }
@@ -52,13 +52,16 @@ export function setupAxios(axios: any) {
   axios.interceptors.request.use(
     (config: { headers: { Authorization: string } }) => {
       const auth = getAuth();
-      if (auth && auth.api_token) {
-        config.headers.Authorization = `Bearer ${auth.api_token}`;
+      if (auth && auth.token) {
+        config.headers.Authorization = `Bearer ${auth.token}`;
       }
 
       return config;
     },
-    (err: any) => Promise.reject(err),
+    (err: any) => {
+      console.log("error");
+      return Promise.reject(err);
+    },
   );
 }
 

@@ -1,19 +1,12 @@
 /* eslint-disable react/jsx-no-target-blank */
-import { useIntl } from "react-intl";
 import { KTIcon } from "../../../helpers";
 import { AsideMenuItemWithSub } from "./AsideMenuItemWithSub";
 import { AsideMenuItem } from "./AsideMenuItem";
 
 export function AsideMenuMain() {
-  const intl = useIntl();
-
   return (
     <>
-      <AsideMenuItem
-        to="/dashboard"
-        icon="element-11"
-        title={intl.formatMessage({ id: "MENU.DASHBOARD" })}
-      />
+      <AsideMenuItem to="/dashboard" icon="element-11" title="Dashboard" />
       <AsideMenuItem to="/builder" icon="switch" title="Layout Builder" />
       <div className="menu-item">
         <div className="menu-content pt-8 pb-2">
