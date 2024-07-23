@@ -31,7 +31,6 @@ const PrivateRoutes = () => {
           }
         />
         <Route path="menu-test" element={<MenuTestPage />} />
-        {/* Lazy Modules */}
         <Route
           path="crafted/pages/profile/*"
           element={

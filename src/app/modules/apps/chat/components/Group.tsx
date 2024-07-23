@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { FC } from "react";
 import { KTIcon, toAbsoluteUrl } from "../../../../../_metronic/helpers";
-import { ChatInner, Dropdown1 } from "../../../../../_metronic/partials";
+import { Dropdown1 } from "../../../../../_metronic/partials";
 
 const Group: FC = () => {
   return (
@@ -409,8 +409,6 @@ const Group: FC = () => {
               </div>
             </div>
           </div>
-
-          <ChatInner />
         </div>
       </div>
     </div>
