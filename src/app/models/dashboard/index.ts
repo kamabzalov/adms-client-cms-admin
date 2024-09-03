@@ -14,4 +14,5 @@ export interface SiteMessage {
   topic: string;
   updated: Date;
   useruid: string;
+  message: string;
 }

@@ -94,6 +94,9 @@ const DashboardPage = () => {
                       <span className="text-muted fw-semibold d-block">
                         Phone: {message.phone}
                       </span>
+                      <span className="text-muted fw-semibold d-block">
+                        Message: {message.message}
+                      </span>
                     </div>
                   </div>
                 );
