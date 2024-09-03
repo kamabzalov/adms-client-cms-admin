@@ -67,7 +67,7 @@ export function setupAxios(axios: any) {
     (error: AxiosError) => {
       if (error?.response?.status === 401) {
         localStorage.removeItem(AUTH_LOCAL_STORAGE_KEY);
-        window.location.href = "http://localhost:3000/";
+        window.location.href = "/";
       }
       return error;
     },
