@@ -1,4 +1,5 @@
 import { UserModel } from "../../../models/auth";
+import { AxiosError } from "axios";
 
 const AUTH_LOCAL_STORAGE_KEY = "client-site-cms";
 
@@ -58,9 +59,17 @@ export function setupAxios(axios: any) {
 
       return config;
     },
-    (err: any) => {
-      console.log("error");
-      return Promise.reject(err);
+  );
+  axios.interceptors.response.use(
+    (response: any) => {
+      return response;
+    },
+    (error: AxiosError) => {
+      if (error?.response?.status === 401) {
+        localStorage.removeItem(AUTH_LOCAL_STORAGE_KEY);
+        window.location.href = "http://localhost:3000/";
+      }
+      return error;
     },
   );
 }

@@ -1,27 +1,28 @@
 import { useAuth } from "../../modules/auth";
 import { useQuery } from "react-query";
-import { generateSiteKey, getSiteKey } from "../../http/_requests";
+import { generateSiteKey, getMessages, getSiteKey } from "../../http/_requests";
 import { useFormik } from "formik";
-import { useState } from "react";
+import React, { useState } from "react";
 import { SiteKey } from "../../models/dashboard";
 
 const DashboardPage = () => {
   const { currentUser } = useAuth();
-  const [siteKey, setSiteKey] = useState<SiteKey | undefined>(undefined);
-  useQuery({
+  const [, setSiteKey] = useState<SiteKey | undefined>(undefined);
+  const { data } = useQuery({
     queryKey: ["siteKey"],
-    queryFn: () =>
-      getSiteKey(currentUser?.useruid).then((response) => {
-        if (response.apikey) {
-          setSiteKey(response);
-        }
-      }),
+    queryFn: () => getSiteKey(currentUser?.useruid),
+    staleTime: Infinity,
+  });
+
+  const { data: messages } = useQuery({
+    queryKey: ["messages"],
+    queryFn: () => getMessages(currentUser?.useruid),
     staleTime: Infinity,
   });
 
   const formik = useFormik({
     initialValues: {
-      siteKey: siteKey?.apikey ?? "",
+      siteKey: data?.apikey ?? "",
     },
     enableReinitialize: true,
     onSubmit: async () => {
@@ -33,7 +34,12 @@ const DashboardPage = () => {
     <>
       <div className="row gy-5 g-xl-8">
         <div className="card">
-          <div className="card-body border-0 pt-6 pb-6">
+          <div className="card-header border-0">
+            <h3 className="card-title fw-bold text-dark">
+              General site settings
+            </h3>
+          </div>
+          <div className="card-body border-0 pt-0 pb-6">
             <form
               className="form row align-items-center"
               onSubmit={formik.handleSubmit}
@@ -59,9 +65,42 @@ const DashboardPage = () => {
                 </button>
               </div>
             </form>
-            <div className="separator separator-dashed my-5"></div>
           </div>
         </div>
+        {messages?.length && (
+          <div className="card">
+            <div className="card-header border-0">
+              <h3 className="card-title fw-bold text-dark">
+                Messages from site
+              </h3>
+            </div>
+            <div className="card-body pt-0">
+              {messages.map((message, index) => {
+                return (
+                  <div
+                    key={message.id}
+                    className="d-flex align-items-center mb-8"
+                  >
+                    <div className="flex-grow-1">
+                      <span className="text-gray-800 text-hover-primary fw-bold fs-6">
+                        Subject: {message.topic}
+                      </span>
+                      <span className="text-muted fw-semibold d-block">
+                        Author: {message.nickname}
+                      </span>
+                      <span className="text-muted fw-semibold d-block">
+                        Email: {message.email}
+                      </span>
+                      <span className="text-muted fw-semibold d-block">
+                        Phone: {message.phone}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
